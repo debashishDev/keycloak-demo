@@ -7,7 +7,7 @@
       "start": "node app.js"
     },
     "dependencies": {
-      "express": "^4.17.1",
+      "express": "^4.19.2",
       "start": "^5.1.0",
       "string-replace-middleware": "^1.0.2"
     }

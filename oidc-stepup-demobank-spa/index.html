@@ -67,7 +67,7 @@
             <span>Business</span>
           </h6>
           <a class="nav-link api" id="v-pills-accounts-tab" data-api="accounts" data-bs-toggle="pill" data-bs-target="#v-pills-accounts" type="button" role="tab" aria-controls="v-pills-accounts" aria-selected="false">
-            <i class="fa-solid fa-fingerprint"></i>Manage Accounts
+            <i class="fa-solid fa-fingerprint"></i><span id="accounts-menu-text">Manage Accounts</span>
           </a>
           <h6 class="sidebar-heading d-flex justify-content-between px-3 mt-4">
             <span>Settings</span>
@@ -150,7 +150,8 @@
           <!-- Bank accounts (Protected) -->
           <div class="tab-pane fade" id="v-pills-accounts" role="tabpanel" aria-labelledby="v-pills-accounts-tab" tabindex="0">
             <div class="text-center mt-5">
-              <p class="lead">This page shows the bank accounts information</p>
+              <p class="lead" id="accounts-tab-title">This page shows the bank accounts information</p>
+              <div id="read-only-notice" class="row mb-4"></div>
               <div class="container d-flex justify-content-center card-container"> 
               </div>  
             </div>  

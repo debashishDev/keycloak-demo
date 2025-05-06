@@ -74,8 +74,8 @@ You can see we added the WebAuthn Conditional Enrollment step, which will help b
 
 1. Clone this repository
     ````bash
-    git clone https://github.com/embesozzi/keycloak-workshop-stepup-mfa-biometrics
-    cd keycloak-workshop-stepup-mfa-biometrics
+    git clone https://github.com/debashishDev/keycloak-demo.git
+    cd keycloak-demo
     ````
 
 2. Execute following Docker Compose command to start the deployment
@@ -88,9 +88,9 @@ You can see we added the WebAuthn Conditional Enrollment step, which will help b
 
 | Component                 | URI                        | Username | Password  | Authn or Authz reference|
 | ------------------------- | -------------------------- | -------- | --------- | --------- |
-| Global Bank Portal        | https://public-url/bank     |          |           | pwd (1F) or pwd + passkeys (MFA) |
-| Bank Account API Portal   | https://public-url/api      |          |           | OAuth 2.0 ACR claim loa2  |
-| Bank Loan Portal          | https://public-url/bankloan |          |           | passkeys autofill (1F) or pwd |
+| Global Bank Portal        | https://localhost/bank     |          |           | pwd (1F) or pwd + passkeys (MFA) |
+| Bank Account API Portal   | https://localhost/api      |          |           | OAuth 2.0 ACR claim loa2  |
+| Bank Loan Portal          | https://localhost/bankloan |          |           | passkeys autofill (1F) or pwd |
 | Keycloak Console          | https://localhost          | admin    | password  |
 
 
@@ -173,7 +173,7 @@ You can do it during the sign-up or sign-in process.
 
 ## Use case 3: Sign in Passkey autofill on the Bank Loan (Web)
 
-3.1. Access the [Bank Loan Portal](https://public-url/bankloan)   
+3.1. Access the [Bank Loan Portal](https://localhost/bankloan)   
     <img src="docs/loan-web-1.png" width="60%" height="60%">   
 3.2 Simply click on the username, it will the passkey with autofill 🥰 and choose the passkey.   
     <img src="docs/loan-web-2.png" width="60%" height="60%">

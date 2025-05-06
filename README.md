@@ -81,7 +81,7 @@ You can see we added the WebAuthn Conditional Enrollment step, which will help b
 2. Execute following Docker Compose command to start the deployment
 
    ```sh
-   docker-compose -f docker-compose-idp.yml -f docker-compose-apps.yml -f docker-compose-lb.yml up
+   docker-compose -f docker-compose-idp.yml -f docker-compose-apps.yml -f docker-compose-lb.yml up -d
    ```
 
 3. Access the following URLs below exposed through the NGINX container via a web browser..

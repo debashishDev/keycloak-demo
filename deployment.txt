@@ -25,118 +25,37 @@ sudo usermod -aG docker $USER
 
 # Install certbot for Let's Encrypt SSL certificates
 sudo apt-get install -y certbot
+# Remove any old Docker installations and repositories
+sudo rm /etc/apt/sources.list.d/docker.list
+sudo rm /etc/apt/sources.list.d/archive_uri-https_download_docker_com_linux_ubuntu-bookworm.list
 
-# Get SSL certificates
-sudo certbot certonly --standalone -d keycloak.credio.xyz --agree-tos --email anupam.ratha@gmail.com
+# Update package lists
+sudo apt-get update
 
-# Create directory for certificates
-mkdir -p /opt/keycloak-demo/certs
-sudo cp /etc/letsencrypt/live/keycloak.credio.xyz/fullchain.pem /opt/keycloak-demo/certs/keycloak.credio.xyz.crt
-sudo cp /etc/letsencrypt/live/keycloak.credio.xyz/privkey.pem /opt/keycloak-demo/certs/keycloak.credio.xyz.key
-sudo chmod 644 /opt/keycloak-demo/certs/keycloak.credio.xyz.crt
-sudo chmod 644 /opt/keycloak-demo/certs/keycloak.credio.xyz.key
+# Install required packages
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg
 
-# Set up nginx configuration
-sudo mkdir -p /etc/nginx/sites-available
-sudo nano /etc/nginx/sites-available/keycloak.conf
+# Add Docker's official GPG key for Debian
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-# Get instance information
-gcloud compute instances describe us-demo-vm --format='get(tags.items)'
-gcloud compute instances describe us-demo-vm --format='get(networkInterfaces[0].accessConfigs[0].natIP)'
+# Set up the Docker repository for Debian
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Create a directory for the project and copy files
-mkdir -p ~/keycloak-demo
-cd ~/keycloak-demo
+# Update apt package index
+sudo apt-get update
 
-# Clone repository or copy your Docker Compose files
-# git clone <repository_url> . # Uncomment and update if you're using git
+# Install Docker Engine and containerd
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Update the Nginx configuration to use your domain and SSL certificates
-mkdir -p ~/keycloak-demo/nginx
-cat > ~/keycloak-demo/nginx/default.conf << 'EOF'
-upstream keycloak {
-    server keycloak:8080;
-}
+# Start and enable Docker
+sudo systemctl start docker
+sudo systemctl enable docker
 
-upstream bank {
-    server oidc-stepup-demobank-spa:8000;
-}
-
-upstream loan {
-    server oidc-demobankloan-vue:80;
-}
-
-upstream api {
-    server oauth-stepup-demoapi-spring:8001;
-}
-
-server {
-    listen 80;
-    listen [::]:80;
-    server_name keycloak.credio.xyz;
-    access_log off;
-    return 301 https://$host$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name keycloak.credio.xyz;
-    access_log off;
-    ssl_certificate /root/ssl/keycloak.credio.xyz.crt;
-    ssl_certificate_key /root/ssl/keycloak.credio.xyz.key;
-    
-    include mime.types;
-    default_type application/octet-stream;
-    
-    proxy_buffer_size 128k;
-    proxy_buffers 4 256k;
-    proxy_busy_buffers_size 256k;
-    
-    location / {
-        proxy_pass http://keycloak;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Host $host;
-        proxy_set_header X-Forwarded-Server $host;
-        proxy_set_header X-Forwarded-Proto https;
-    }
-
-    location /bank {
-        proxy_pass http://bank/bank;
-    }
-
-    location /bankloan {
-        proxy_pass http://loan/bankloan;
-    }
-
-    location /api {
-        proxy_pass http://api/api;
-    }
-}
-EOF
-
-# Create certs directory and copy SSL certificates
-mkdir -p ~/keycloak-demo/certs
-cp /opt/keycloak-demo/certs/keycloak.credio.xyz.crt ~/keycloak-demo/certs/localhost.crt
-cp /opt/keycloak-demo/certs/keycloak.credio.xyz.key ~/keycloak-demo/certs/localhost.key
-
-# Set up environment variables
-cat > ~/keycloak-demo/.env << EOF
-KC_VERSION=latest
-DOMAIN_URL=https://keycloak.credio.xyz
-EOF
-
-# Make sure firewall rules allow the necessary ports
-# HTTP/HTTPS are already enabled per the tags
-
-# Run the Docker Compose setup
-cd ~/keycloak-demo
-docker-compose -f docker-compose-idp.yml -f docker-compose-apps.yml -f docker-compose-lb.yml up -d
-
-# Verify services are running
-docker ps
-
-# This command will help you see the IP address of your VM
-echo "Your Keycloak server is accessible at: https://keycloak.credio.xyz"
-echo "VM IP address: $(curl -s ifconfig.me)"
+# Verify installation
+sudo docker run hello-world
